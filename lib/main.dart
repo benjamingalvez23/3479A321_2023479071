@@ -28,9 +28,9 @@ class MyApp extends StatelessWidget {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 0, 221, 255)),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: '2023479071'),
     );
   }
 }
@@ -55,7 +55,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
-
+  
   void _incrementCounter() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
@@ -64,6 +64,17 @@ class _MyHomePageState extends State<MyHomePage> {
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
       _counter++;
+    });
+  }
+  void _restablecer(){
+    setState(() {
+      _counter=0;
+    });
+  }
+  void _decrementoCounter(){
+    setState(() {
+
+      _counter--;
     });
   }
 
@@ -104,7 +115,7 @@ class _MyHomePageState extends State<MyHomePage> {
           // wireframe for each widget.
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text('You have pushed the button this many times:'),
+            const Text('Pixel Art sobre una gri la personalizable'),
             Text(
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
@@ -112,11 +123,26 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+      persistentFooterButtons: [
+        ElevatedButton(onPressed:_decrementoCounter, child: const Text("Incrementar(-)")),
+
+        ElevatedButton(onPressed:_restablecer, child: const Text("Incrementar(0)")),
+
+        ElevatedButton(onPressed:_incrementCounter, child: const Icon(Icons.remove),)
+      ],
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            onPressed: _decrementoCounter,
+            tooltip: 'Decrementar',
+            child: const Icon(Icons.remove),
+          ),
+        ],
       ), // This trailing comma makes auto-formatting nicer for build methods.
+     
+
+
     );
   }
 }
