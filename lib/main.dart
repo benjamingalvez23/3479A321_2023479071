@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 0, 221, 255)),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 0, 217, 255)),
       ),
       home: const MyHomePage(title: '2023479071'),
     );
@@ -55,6 +55,14 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  final List<Color> _colores = [
+    const Color.fromARGB(255, 0, 217, 255), 
+    const Color.fromARGB(255, 212, 255, 0), 
+    const Color.fromARGB(255, 0, 255, 8),   
+  ];
+  int _colorIndex = 0; 
+  late Color _color;  
+  
   
   void _incrementCounter() {
     setState(() {
@@ -77,7 +85,16 @@ class _MyHomePageState extends State<MyHomePage> {
       _counter--;
     });
   }
-
+  void _setcolor() {
+    setState(() {
+      _colorIndex = (_colorIndex + 1) % _colores.length; 
+      _color = _colores[_colorIndex];
+    });
+  }
+  void initState() {
+    super.initState();
+    _color = _colores[_colorIndex]; 
+  }
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -123,26 +140,22 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      persistentFooterButtons: [
-        ElevatedButton(onPressed:_decrementoCounter, child: const Text("Incrementar(-)")),
 
-        ElevatedButton(onPressed:_restablecer, child: const Text("Incrementar(0)")),
-
-        ElevatedButton(onPressed:_incrementCounter, child: const Icon(Icons.remove),)
-      ],
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-            onPressed: _decrementoCounter,
-            tooltip: 'Decrementar',
-            child: const Icon(Icons.remove),
-          ),
-        ],
+      floatingActionButton: FloatingActionButton (
+        onPressed: _setcolor, 
+        backgroundColor: _color,
+        tooltip: 'color',
+        child: const Icon(Icons.color_lens),
       ), // This trailing comma makes auto-formatting nicer for build methods.
-     
+      persistentFooterButtons: [
+        ElevatedButton(onPressed:_decrementoCounter, child: const Icon(Icons.remove),),
 
+        ElevatedButton(onPressed:_restablecer, child: const Icon(Icons.drag_handle)),
 
+        ElevatedButton(onPressed:_incrementCounter, child: const Icon(Icons.add))
+
+        
+      ],
     );
   }
 }
