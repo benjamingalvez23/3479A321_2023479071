@@ -1,15 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+
+    var logger = Logger();
+    logger.d("Logger is working!");
+    
+
     return MaterialApp(
       title: '2023479071',
       theme: ThemeData(
@@ -29,6 +40,7 @@ class MyApp extends StatelessWidget {
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 0, 217, 255)),
+        
       ),
       home: const MyHomePage(title: '2023479071'),
     );
@@ -61,7 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
     const Color.fromARGB(255, 0, 255, 8),   
   ];
   int _colorIndex = 0; 
-  late Color _color;  
+  late Color _color =Color.fromARGB(255, 0, 217, 255);  
   
   
   void _incrementCounter() {
@@ -103,7 +115,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
-    return Scaffold(
+    var scaffold2 = Scaffold(
       appBar: AppBar(
         // TRY THIS: Try changing the color here to a specific color (to
         // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
@@ -137,6 +149,23 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+              children: [
+                Image.asset('Pixel-Art-Hot-Pepper-2-1.webp', width: 400, fit: BoxFit.cover,),
+              
+              
+                Image.asset('Pixel-Art-Pizza-2.webp', width: 400, fit: BoxFit.cover,),
+              
+        
+                Image.asset('Pixel-Art-Watermelon-3.webp', width: 400, fit: BoxFit.cover,)
+              ],
+            ) ,
+            )
+
+           
+            
           ],
         ),
       ),
@@ -157,5 +186,7 @@ class _MyHomePageState extends State<MyHomePage> {
         
       ],
     );
+    var scaffold = scaffold2;
+    return scaffold;
   }
 }
