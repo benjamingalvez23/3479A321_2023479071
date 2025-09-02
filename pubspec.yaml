@@ -52,20 +52,16 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-  # The following line ensures that the Material Icons font is
-  # included with your application, so that you can use the icons in
-  # the material Icons class.
+  fonts:
+    - family: 28DaysLater
+      fonts:
+        - asset: assets/fonts/28DaysLater.ttf
   uses-material-design: true
 assets:
     - assets/Pixel-Art-Hot-Pepper-2-1.webp
     - assets/Pixel-Art-Pizza-2.webp
     - assets/Pixel-Art-Watermelon-3.webp
-fonts:
-    - family: ChicagoAthletic
-      fonts:
-        - asset: fonts/ChicagoAthletic.ttf
-        - asset: fonts/ChicagoAthleticSlabSerif2.ttf
-          weight: 700 
+
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

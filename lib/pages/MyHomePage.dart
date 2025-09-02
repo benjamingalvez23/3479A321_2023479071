@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  const MyHomePage({super.key});
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -14,7 +14,6 @@ class MyHomePage extends StatefulWidget {
   // used by the build method of the State. Fields in a Widget subclass are
   // always marked "final".
 
-  final String title;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -79,7 +78,7 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: const Text('2023479071', style: TextStyle(fontFamily: '28DaysLater')),
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
@@ -100,7 +99,7 @@ class _MyHomePageState extends State<MyHomePage> {
           // wireframe for each widget.
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text('Pixel Art sobre una gri la personalizable', ),
+            Text('Pixel Art sobre una gri la personalizable', style: TextStyle(fontFamily: '28DaysLater'),),
             Text(
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
