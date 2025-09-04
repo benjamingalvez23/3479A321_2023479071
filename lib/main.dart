@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lab2/screens/lista_art.dart';
 
 void main() {
   runApp(const MyApp());
@@ -77,10 +78,9 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Center(
-        
-        child: Column(
-          
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: Card(
+          elevation: 10,
+          child: Column(mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             const Text('Pixel Art sobre una gri la personalizable'),
             Text(
@@ -89,7 +89,9 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ],
         ),
-      ),
+
+          ),
+        ),
 
       floatingActionButton: FloatingActionButton (
         onPressed: _setcolor, 
