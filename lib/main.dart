@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:lab2/screens/lista_art.dart';
 
+import 'package:flutter/material.dart';
+import 'package:lab2/screens/list_creation.dart';
+import 'package:lab2/screens/lista_art.dart';
 void main() {
   runApp(const MyApp());
 }
@@ -16,7 +17,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 0, 217, 255)),
       ),
-      home: const MyHomePage(title: '2023479071'),
+     // home: const ListCreation(), 
+    // home: const ListArt()
+     // home: const Sobre()
+     home: const MyHomePage(title: '2023479071')
     );
   }
 }
@@ -31,42 +35,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-  final List<Color> _colores = [
-    const Color.fromARGB(255, 0, 217, 255), 
-    const Color.fromARGB(255, 212, 255, 0), 
-    const Color.fromARGB(255, 0, 255, 8),   
-  ];
-  int _colorIndex = 0; 
-  late Color _color;  
-  
-  
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-  void _restablecer(){
-    setState(() {
-      _counter=0;
-    });
-  }
-  void _decrementoCounter(){
-    setState(() {
 
-      _counter--;
-    });
-  }
-  void _setcolor() {
-    setState(() {
-      _colorIndex = (_colorIndex + 1) % _colores.length; 
-      _color = _colores[_colorIndex];
-    });
-  }
-  void initState() {
-    super.initState();
-    _color = _colores[_colorIndex]; 
-  }
   @override
   Widget build(BuildContext context) {
     
@@ -76,38 +45,55 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         
         title: Text(widget.title),
+        
       ),
       body: Center(
         child: Card(
           elevation: 10,
-          child: Column(mainAxisAlignment: MainAxisAlignment.center,
+          child: Column(mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            const Text('Pixel Art sobre una gri la personalizable'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+            const Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Text(
+                'Título',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+            ),
+            Container(
+              width: 250,
+              height: 250,
+              color: const Color.fromARGB(255, 8, 225, 8), 
+              child: const Center(
+                child: Text('Imágenes.'),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly, 
+                children: <Widget>[
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=> const ListArt()));
+                    },
+                    child: const Text('Crear'),
+                  ),
+                  ElevatedButton(onPressed: (){
+                    Navigator.push(context,  MaterialPageRoute(builder: (context)=> const ListCreation()));
+                  },child: const Text('Creaciones'),),
+                  ElevatedButton(
+                    onPressed: () {
+                      
+                    },
+                    child: const Text('Compartir'),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
-
           ),
         ),
-
-      floatingActionButton: FloatingActionButton (
-        onPressed: _setcolor, 
-        backgroundColor: _color,
-        tooltip: 'color',
-        child: const Icon(Icons.color_lens),
-      ), 
-      persistentFooterButtons: [
-        ElevatedButton(onPressed:_decrementoCounter, child: const Icon(Icons.remove),),
-
-        ElevatedButton(onPressed:_restablecer, child: const Icon(Icons.drag_handle)),
-
-        ElevatedButton(onPressed:_incrementCounter, child: const Icon(Icons.add))
-
-        
-      ],
     );
   }
 }
