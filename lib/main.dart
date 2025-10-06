@@ -1,8 +1,11 @@
 
 import 'package:flutter/material.dart';
+import 'package:lab2/pixel_art_screen.dart';
 import 'package:lab2/screens/list_creation.dart';
 import 'package:lab2/screens/lista_art.dart';
 import 'package:logger/logger.dart';
+import 'package:provider/provider.dart';
+import 'package:lab2/providers/ConfigurationData.dart';
 void main() {
   runApp(const MyApp());
 }
@@ -15,7 +18,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
 
@@ -23,15 +25,15 @@ class _MyAppState extends State<MyApp> {
     logger.d("Logger is working!");
     
 
-    return MaterialApp(
-      title: '2023479071',
+    return ChangeNotifierProvider<Configurationdata>(
+      create: (context) => Configurationdata(),
+      child: MaterialApp(
+        title: '2023479071',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 0, 217, 255)),
       ),
-     // home: const ListCreation(), 
-    // home: const ListArt()
-     // home: const Sobre()
      home: const MyHomePage(title: '2023479071')
+      ),
     );
   }
 }
@@ -98,9 +100,17 @@ class _MyHomePageState extends State<MyHomePage> {
                     },
                     child: const Text('Compartir'),
                   ),
+                  ElevatedButton( onPressed: () {
+          Navigator.push(
+            context, 
+            MaterialPageRoute(builder: (context) => const PixelArtScreen())
+          );
+        },
+        child: const Text('Pixel Art'),)
                 ],
               ),
             ),
+            
           ],
         ),
           ),
