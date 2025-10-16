@@ -34,6 +34,7 @@ class _MyAppState extends State<MyApp> {
             seedColor: const Color.fromARGB(255, 0, 217, 255)
           ),
         ),
+        debugShowCheckedModeBanner: false,
         home: const MyHomePage(title: '2023479071')
       ),
     );
