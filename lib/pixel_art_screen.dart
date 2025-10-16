@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'dart:io';
+import 'dart:ui' as ui;
 import 'package:provider/provider.dart';
 import 'package:lab2/providers/ConfigurationData.dart';
 
@@ -30,7 +32,6 @@ class _PixelArtScreenState extends State<PixelArtScreen> {
    Colors.grey, 
    Colors.pink, 
  ]; 
- 
  
  late final List<Color> _cellColors = List<Color>.generate( 
    _sizeGrid * _sizeGrid, 
@@ -74,6 +75,29 @@ class _PixelArtScreenState extends State<PixelArtScreen> {
    logger.d("PixelArtScreen reassembled. Mounted: $mounted"); 
  } 
  
+// ignore: unused_element
+Future<void> _saveArt() async { 
+final recorder = ui.PictureRecorder();
+final canvas = Canvas(recorder, Rect.fromLTWH(0, 0, _sizeGrid * 20.0,
+_sizeGrid * 20.0));
+
+for (int i = 0; i < _sizeGrid; i++) {
+  for (int col = 0; col < _sizeGrid; col++) {
+    final color = _cellColors[i * _sizeGrid + col];
+    final paint = Paint()..color = color;
+    canvas.drawRect(Rect.fromLTWH(col * 20.0, i * 20.0, 20.0, 20.0), paint);
+}
+}
+final picture = recorder.endRecording();
+final imagen = await picture.toImage(_sizeGrid * 20, _sizeGrid * 20);
+final byteData = await imagen.toByteData(format: ui.ImageByteFormat.png);
+
+final imageBytes = byteData!.buffer.asUint8List();
+
+final directory = await getApplicationDocumentsDirectory();
+}
+
+
  @override 
  Widget build(BuildContext context) { 
    return Scaffold( 
@@ -182,5 +206,7 @@ class _PixelArtScreenState extends State<PixelArtScreen> {
        ), 
      ), 
    ); 
- } 
+ }
+ 
+  Future getApplicationDocumentsDirectory() async {} 
 } 
