@@ -1,3 +1,4 @@
+// configuration_screen.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:lab2/providers/ConfigurationData.dart';
@@ -17,7 +18,8 @@ class _ConfigurationScreenState extends State<ConfigurationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final config = context.watch<Configurationdata>();
+    // CORRECCIÓN: Uso de ConfigurationData
+    final config = context.watch<ConfigurationData>(); 
 
     return Scaffold(
       appBar: AppBar(
@@ -56,7 +58,8 @@ class _ConfigurationScreenState extends State<ConfigurationScreen> {
               }).toList(),
               onChanged: (value) {
                 if (value != null) {
-                  context.read<Configurationdata>().setsize(value);
+                  // CORRECCIÓN: Uso de ConfigurationData
+                  context.read<ConfigurationData>().setsize(value);
                 }
               },
             ),
@@ -84,7 +87,8 @@ class _ConfigurationScreenState extends State<ConfigurationScreen> {
               }).toList(),
               onChanged: (value) {
                 if (value != null) {
-                  context.read<Configurationdata>().setcolorPalette(value);
+                  // CORRECCIÓN: Uso de ConfigurationData
+                  context.read<ConfigurationData>().setcolorPalette(value);
                 }
               },
             ),
@@ -95,18 +99,6 @@ class _ConfigurationScreenState extends State<ConfigurationScreen> {
               color: Colors.blue.shade50,
               child: const Padding(
                 padding: EdgeInsets.all(16.0),
-                child: Row(
-                  children: [
-                    Icon(Icons.info_outline, color: Colors.blue),
-                    SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        'Los cambios se aplican automáticamente',
-                        style: TextStyle(fontSize: 14),
-                      ),
-                    ),
-                  ],
-                ),
               ),
             ),
 

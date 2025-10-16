@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:lab2/pixel_art_screen.dart';
 import 'package:lab2/screens/list_creation.dart';
 import 'package:lab2/screens/lista_art.dart';
-import 'package:lab2/screens/configuration_screen.dart'; 
+import 'package:lab2/screens/configuration_screen.dart';
+import 'package:lab2/services/shared_preferences_service.dart'; 
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:lab2/providers/ConfigurationData.dart';
@@ -24,8 +25,8 @@ class _MyAppState extends State<MyApp> {
     var logger = Logger();
     logger.d("Logger is working!");
     
-    return ChangeNotifierProvider<Configurationdata>(
-      create: (context) => Configurationdata(),
+    return ChangeNotifierProvider<ConfigurationData>( 
+      create: (context) => ConfigurationData(SharedPreferencesService()),
       child: MaterialApp(
         title: '2023479071',
         theme: ThemeData(
