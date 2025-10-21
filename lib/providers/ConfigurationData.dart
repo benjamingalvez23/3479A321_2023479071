@@ -1,13 +1,16 @@
 // ignore: file_names
 import 'package:flutter/material.dart';
 import 'package:lab2/services/shared_preferences_service.dart';
+import 'package:logger/logger.dart';
 
 class ConfigurationData extends ChangeNotifier {
   final SharedPreferencesService _prefsService; 
-
+  final Logger logger = Logger();
   int _size = 12; 
   String _colorPalette = 'basica';
   List<String> _creations = []; // Lista de rutas de archivos creados
+  String _title = '';
+  bool _showNumbers = true;
   
   final Map<String, List<Color>> _palettes = {
     'basica': [
@@ -41,72 +44,123 @@ class ConfigurationData extends ChangeNotifier {
     ],
   };
   
-  int get size => _size;
+    int get size => _size;
   String get colorPalette => _colorPalette;
-  List<String> get creations => List.unmodifiable(_creations); // Devolver copia inmutable
+  List<String> get creations => List.unmodifiable(_creations);
+  String get title => _title;
+  bool get showNumbers => _showNumbers;
   
   List<Color> get currentColorPalette {
-    return _palettes[_colorPalette] ?? _palettes['basica']!; 
+    return _palettes[_colorPalette] ?? _palettes['basica']!;
   }
 
   ConfigurationData(this._prefsService) {
-    _loadPreferences(); 
+    _loadPreferences();
   }
 
   Future<void> _loadPreferences() async {
-    final data = await _prefsService.loadPreferences();
-    _size = data['size'] as int;
-    _colorPalette = data['colorPalette'] as String;
-    
-    // Cargar las creaciones guardadas
-    final loadedCreations = await _prefsService.loadCreations();
-    _creations = List<String>.from(loadedCreations);
+    try {
+      final data = await _prefsService.loadPreferences();
+      _size = data['size'] as int;
+      _colorPalette = data['colorPalette'] as String;
+      _showNumbers = data['showNumbers'] as bool? ?? true;
+      _title = data['title'] as String? ?? '';
       
-    notifyListeners(); 
-  }
-
-  void setsize(int newsize) {
-    if (_size != newsize) {
-      _size = newsize;
-      _prefsService.saveSize(newsize);
-      notifyListeners(); 
-    }
-  }
-  
-  void setcolorPalette(String newcolorPalette) {
-    if (_colorPalette != newcolorPalette) {
-      _colorPalette = newcolorPalette;
-      _prefsService.saveColorPalette(newcolorPalette);
-      notifyListeners(); 
+      final loadedCreations = await _prefsService.loadCreations();
+      _creations = List<String>.from(loadedCreations);
+      
+      notifyListeners();
+      logger.i('Preferences loaded successfully');
+    } catch (e) {
+      logger.e('Error loading preferences: $e');
     }
   }
 
-  // Agregar una nueva creación
+  Future<void> setsize(int newsize) async {
+    try {
+      if (_size != newsize) {
+        _size = newsize;
+        await _prefsService.saveSize(newsize);
+        notifyListeners();
+        logger.i('Size updated to: $newsize');
+      }
+    } catch (e) {
+      logger.e('Error saving size: $e');
+    }
+  }
+
+  Future<void> setcolorPalette(String newPalette) async {
+    try {
+      if (_colorPalette != newPalette) {
+        _colorPalette = newPalette;
+        await _prefsService.saveColorPalette(newPalette);
+        notifyListeners();
+        logger.i('Color palette updated to: $newPalette');
+      }
+    } catch (e) {
+      logger.e('Error saving color palette: $e');
+    }
+  }
+
+  Future<void> setTitle(String newTitle) async {
+    try {
+      if (_title != newTitle) {
+        _title = newTitle;
+        await _prefsService.saveTitle(newTitle);
+        notifyListeners();
+        logger.i('Title updated to: $newTitle');
+      }
+    } catch (e) {
+      logger.e('Error saving title: $e');
+    }
+  }
+
+  Future<void> setShowNumbers(bool value) async {
+    try {
+      if (_showNumbers != value) {
+        _showNumbers = value;
+        await _prefsService.saveShowNumbers(value);
+        notifyListeners();
+        logger.i('Show numbers updated to: $value');
+      }
+    } catch (e) {
+      logger.e('Error saving show numbers setting: $e');
+    }
+  }
+
   void addCreation(String filePath) {
-    if (!_creations.contains(filePath)) {
-      _creations.add(filePath);
+    try {
+      if (!_creations.contains(filePath)) {
+        _creations.add(filePath);
+        _prefsService.saveCreations(_creations);
+        notifyListeners();
+        logger.i('Creation added: $filePath');
+      }
+    } catch (e) {
+      logger.e('Error adding creation: $e');
+    }
+  }
+
+  void removeCreation(String filePath) {
+    try {
+      if (_creations.remove(filePath)) {
+        _prefsService.saveCreations(_creations);
+        notifyListeners();
+        logger.i('Creation removed: $filePath');
+      }
+    } catch (e) {
+      logger.e('Error removing creation: $e');
+    }
+  }
+
+  void clearCreations() {
+    try {
+      _creations.clear();
       _prefsService.saveCreations(_creations);
       notifyListeners();
+      logger.i('All creations cleared');
+    } catch (e) {
+      logger.e('Error clearing creations: $e');
     }
-  }
-
-  // Obtener la última creación
-  String? getLastCreation() {
-    if (_creations.isEmpty) return null;
-    return _creations.last;
-  }
-
-  // Eliminar una creación
-  void removeCreation(String filePath) {
-    _creations.remove(filePath);
-    _prefsService.saveCreations(_creations);
-    notifyListeners();
-  }
-
-  // Limpiar todas las creaciones
-  void clearCreations() {
-    _creations.clear();
-    _prefsService.saveCreations(_creations);
-    notifyListeners();
   }
 }

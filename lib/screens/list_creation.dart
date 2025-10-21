@@ -22,18 +22,15 @@ class _ListCreationState extends State<ListCreation> {
     _loadCreations();
   }
 
-  // Cargar las creaciones desde el provider
   Future<void> _loadCreations() async {
     setState(() {
       isLoading = true;
     });
 
     try {
-      // Obtener las creaciones del provider
       final configData = context.read<ConfigurationData>();
       final loadedCreations = configData.creations;
 
-      // Filtrar solo los archivos que existen
       List<String> existingFiles = [];
       for (String filePath in loadedCreations) {
         final file = File(filePath);
@@ -82,28 +79,17 @@ class _ListCreationState extends State<ListCreation> {
       );
 
       if (shouldDelete == true) {
-        // Eliminar el archivo
         final file = File(filePath);
         if (await file.exists()) {
           await file.delete();
         }
 
-        // Eliminar del provider
         if (mounted) {
           context.read<ConfigurationData>().removeCreation(filePath);
 
-          // Eliminar de la lista local
           setState(() {
             creations.removeAt(index);
           });
-
-          // Mostrar mensaje
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Creación eliminada'),
-              backgroundColor: Colors.red,
-            ),
-          );
         }
       }
     } catch (e) {
