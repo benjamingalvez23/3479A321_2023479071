@@ -1,212 +1,289 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
-import 'dart:io';
-import 'dart:ui' as ui;
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:lab2/providers/ConfigurationData.dart';
+import 'dart:io';
+import 'dart:ui' as ui;
 
 class PixelArtScreen extends StatefulWidget { 
- const PixelArtScreen({super.key}); 
- 
- @override 
- // ignore: library_private_types_in_public_api
- _PixelArtScreenState createState() => _PixelArtScreenState(); 
+  const PixelArtScreen({super.key}); 
+  
+  @override 
+  // ignore: library_private_types_in_public_api
+  _PixelArtScreenState createState() => _PixelArtScreenState(); 
 } 
  
 class _PixelArtScreenState extends State<PixelArtScreen> { 
   Logger logger = Logger(); 
- int _sizeGrid = 16; 
- Color _selectedColor = Colors.black; 
+  int _sizeGrid = 16; 
+  Color _selectedColor = Colors.black; 
+  
+  bool _showNumbers = true;
+  // ignore: unused_field
+  final bool _isSaving = false; // Nuevo: bandera para controlar el guardado 
  
- final List<Color> _listColors = [ 
-   Colors.black, 
-   Colors.white, 
-   Colors.red, 
-   Colors.orange, 
-   Colors.yellow, 
-   Colors.green, 
-   Colors.blue, 
-   Colors.indigo, 
-   Colors.purple, 
-   Colors.brown, 
-   Colors.grey, 
-   Colors.pink, 
- ]; 
+  final List<Color> _listColors = [ 
+    Colors.black, 
+    Colors.white, 
+    Colors.red, 
+    Colors.orange, 
+    Colors.yellow, 
+    Colors.green, 
+    Colors.blue, 
+    Colors.indigo, 
+    Colors.purple, 
+    Colors.brown, 
+    Colors.grey, 
+    Colors.pink, 
+  ]; 
  
- late final List<Color> _cellColors = List<Color>.generate( 
-   _sizeGrid * _sizeGrid, 
-   (index) => Colors.transparent, 
- );
+  late List<Color> _cellColors;
+ 
   @override 
- void initState() { 
-   super.initState(); 
-   logger.d("PixelArtScreen initialized. Mounted: $mounted"); 
-   _sizeGrid = context.read<ConfigurationData>().size; 
-   logger.d("Grid size set to: $_sizeGrid"); 
- } 
+  void initState() { 
+    super.initState(); 
+    logger.d("PixelArtScreen initialized. Mounted: $mounted"); 
+    _sizeGrid = context.read<ConfigurationData>().size;
+    
+    // Inicializar _cellColors con el tamaño correcto
+    _cellColors = List<Color>.generate(
+      _sizeGrid * _sizeGrid,
+      (index) => Colors.transparent,
+    );
+    
+    logger.d("Grid size set to: $_sizeGrid"); 
+  } 
  
- @override 
- void didChangeDependencies() { 
-   super.didChangeDependencies(); 
-   _sizeGrid = context.watch<ConfigurationData>().size; 
-   logger.d("Dependencies changed in PixelArtScreen. Mounted: $mounted"); 
- } 
- @override 
- void didUpdateWidget(covariant PixelArtScreen oldWidget) { 
-   super.didUpdateWidget(oldWidget); 
-   logger.d("PixelArtScreen widget updated. Mounted: $mounted"); 
- } 
- 
- @override 
- void deactivate() { 
-   super.deactivate(); 
-   logger.d("PixelArtScreen deactivated. Mounted: $mounted"); 
- } 
- 
- @override 
- void dispose() { 
-   super.dispose(); 
-   logger.d("PixelArtScreen disposed. Mounted: $mounted"); 
- } 
- 
- @override 
- void reassemble() { 
-   super.reassemble(); 
-   logger.d("PixelArtScreen reassembled. Mounted: $mounted"); 
- } 
- 
-// ignore: unused_element
-Future<void> _saveArt() async { 
-final recorder = ui.PictureRecorder();
-final canvas = Canvas(recorder, Rect.fromLTWH(0, 0, _sizeGrid * 20.0,
-_sizeGrid * 20.0));
+  @override 
+  void didChangeDependencies() { 
+    super.didChangeDependencies(); 
+    
+    final newSize = context.watch<ConfigurationData>().size;
+    
+    // Si el tamaño cambió, ajustar _cellColors
+    if (newSize != _sizeGrid) {
+      final oldColors = _cellColors;
+      _cellColors = List<Color>.generate(
+        newSize * newSize,
+        (index) => Colors.transparent,
+      );
+      
+      // Copiar los colores antiguos si es posible
+      final minSize = _sizeGrid < newSize ? _sizeGrid : newSize;
+      for (int row = 0; row < minSize; row++) {
+        for (int col = 0; col < minSize; col++) {
+          final oldIndex = row * _sizeGrid + col;
+          final newIndex = row * newSize + col;
+          if (oldIndex < oldColors.length) {
+            _cellColors[newIndex] = oldColors[oldIndex];
+          }
+        }
+      }
+      
+      setState(() {
+        _sizeGrid = newSize;
+      });
+    }
+    
+    logger.d("Dependencies changed in PixelArtScreen. Mounted: $mounted"); 
+  } 
+  
+  @override 
+  void didUpdateWidget(covariant PixelArtScreen oldWidget) { 
+    super.didUpdateWidget(oldWidget); 
+    logger.d("PixelArtScreen widget updated. Mounted: $mounted"); 
+  } 
+  
+  @override 
+  void deactivate() { 
+    super.deactivate(); 
+    logger.d("PixelArtScreen deactivated. Mounted: $mounted"); 
+  } 
+  
+  @override 
+  void dispose() { 
+    super.dispose(); 
+    logger.d("PixelArtScreen disposed. Mounted: $mounted"); 
+  } 
+  
+  @override 
+  void reassemble() { 
+    super.reassemble(); 
+    logger.d("PixelArtScreen reassembled. Mounted: $mounted"); 
+  } 
 
-for (int i = 0; i < _sizeGrid; i++) {
-  for (int col = 0; col < _sizeGrid; col++) {
-    final color = _cellColors[i * _sizeGrid + col];
-    final paint = Paint()..color = color;
-    canvas.drawRect(Rect.fromLTWH(col * 20.0, i * 20.0, 20.0, 20.0), paint);
-}
-}
-final picture = recorder.endRecording();
-final imagen = await picture.toImage(_sizeGrid * 20, _sizeGrid * 20);
-final byteData = await imagen.toByteData(format: ui.ImageByteFormat.png);
+  // Función para guardar el pixel art
+  Future<void> _savePixelArt() async { 
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(
+      recorder, 
+      Rect.fromLTWH(0, 0, _sizeGrid * 20.0, _sizeGrid * 20.0)
+    );
 
-final imageBytes = byteData!.buffer.asUint8List();
+    // Dibujar cada celda en el canvas
+    for (int row = 0; row < _sizeGrid; row++) {
+      for (int col = 0; col < _sizeGrid; col++) {
+        final color = _cellColors[row * _sizeGrid + col];
+        final paint = Paint()..color = color;
+        final rect = Rect.fromLTWH(col * 20.0, row * 20.0, 20.0, 20.0);
+        canvas.drawRect(rect, paint);
+      }
+    }
 
-final directory = await getApplicationDocumentsDirectory();
-}
+    // Convertir a imagen
+    final picture = recorder.endRecording();
+    final image = await picture.toImage(_sizeGrid * 20, _sizeGrid * 20);
+    final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    final imageBytes = byteData!.buffer.asUint8List();
 
+    // Guardar en el directorio de documentos
+    final directory = await getApplicationDocumentsDirectory();
+    final filePath = '${directory.path}/pixel_art_${DateTime.now().millisecondsSinceEpoch}.png';
+    final file = File(filePath);
+    await file.writeAsBytes(imageBytes);
 
- @override 
- Widget build(BuildContext context) { 
-   return Scaffold( 
-     appBar: AppBar( 
-       title: const Text('Creation Process'), 
-        ), 
-     body: SafeArea( 
-       child: Column( 
-         children: [ 
-           Padding( 
-             padding: const EdgeInsets.all(8.0), 
-             child: Row( 
-               mainAxisAlignment: MainAxisAlignment.spaceBetween, 
-               children: [ 
-               Text('$_sizeGrid x $_sizeGrid'), 
-               SizedBox(width: 8), 
-               Expanded( 
-                 child: Padding( 
-                 padding: const EdgeInsets.symmetric(horizontal: 8.0), 
-                 child: TextField( 
-                   decoration: const InputDecoration( 
-                   hintText: 'Enter title', 
-                   border: OutlineInputBorder(), 
-                   ), 
-                   onSubmitted: (value) { 
-                   logger.d('Title entered: $value'); 
-                   }, 
-                 ), 
-                 ), 
-               ), 
-               ElevatedButton( 
-                 onPressed: () { 
-                 logger.d('Button pressed'); 
-                 }, 
-                 child: const Text('Submit'), 
-               ), 
-               ], 
-             ), 
-           ), 
-           Expanded( 
-             child: GridView.builder( 
-               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount( 
-                 crossAxisCount: _sizeGrid, 
-               ), 
-               itemCount: _sizeGrid * _sizeGrid, 
-               itemBuilder: (context, index) { 
-                 return GestureDetector( 
-                   onTap: () { 
-                     setState(() { 
-                       _cellColors[index] = _selectedColor; 
-                     }); 
-                   }, 
-                   child: Container( 
-                     margin: const EdgeInsets.all(1),
-                      color: _cellColors[index], 
-                     child: Center( 
-                       child: Text( 
-                         '$index', 
-                         style: TextStyle( 
-                           color: _cellColors[index] == Colors.black 
-                               ? Colors.white 
-                               : Colors.black, 
-                         ), 
-                       ), 
-                     ), 
-                   ), 
-                 ); 
-               }, 
-             ), 
-           ), 
-           Container( 
-             padding: const EdgeInsets.symmetric(vertical: 8), 
-             color: Colors.grey[200], 
-             child: SingleChildScrollView( 
-               scrollDirection: Axis.horizontal, 
-               child: Row( 
-                 mainAxisAlignment: MainAxisAlignment.center, 
-                 children: _listColors.map((color) { 
-                   final bool isSelected = color == _selectedColor; 
-                   return GestureDetector( 
-                     onTap: () { 
-                       setState(() { 
-                         _selectedColor = color; 
-                       }); 
-                     }, 
-                     child: AnimatedContainer( 
-                       duration: const Duration(milliseconds: 200), 
-                       margin: const EdgeInsets.symmetric(horizontal: 4), 
-                       padding: EdgeInsets.all(isSelected ? 12 : 8), 
-                       decoration: BoxDecoration( 
-                         color: color, 
-                         shape: BoxShape.circle, 
-                         border: isSelected 
-                             ? Border.all(color: Colors.black, width: 2) 
-                             : null, 
-                       ), 
-                       width: isSelected ? 36 : 28, 
-                       height: isSelected ? 36 : 28, 
-                     ), 
-                   ); 
-                 }).toList(), 
-               ), 
-             ),
+    logger.d('Pixel art saved to: $filePath');
+
+    // Agregar la creación al provider
+    if (mounted) {
+      context.read<ConfigurationData>().addCreation(filePath);
+
+      // Mostrar mensaje de éxito
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Pixel art guardado exitosamente!'),
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+
+      // Navegar de vuelta y pasar el filePath
+      Navigator.pop(context, filePath);
+    }
+  }
+
+  @override 
+  Widget build(BuildContext context) { 
+    return Scaffold( 
+      appBar: AppBar( 
+        title: const Text('Creation Process'), 
+        actions: [
+          IconButton(
+            icon: Icon(_showNumbers ? Icons.visibility : Icons.visibility_off),
+            onPressed: () {
+              setState(() {
+                _showNumbers = !_showNumbers;
+                logger.d('Toggle numbers visibility: $_showNumbers'); 
+              });
+            },
+          ),
+        ],
+      ), 
+      body: SafeArea( 
+        child: Column( 
+          children: [ 
+            Padding( 
+              padding: const EdgeInsets.all(8.0), 
+              child: Row( 
+                mainAxisAlignment: MainAxisAlignment.spaceBetween, 
+                children: [ 
+                  Text('$_sizeGrid x $_sizeGrid'), 
+                  const SizedBox(width: 8), 
+                  Expanded( 
+                    child: Padding( 
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0), 
+                      child: TextField( 
+                        decoration: const InputDecoration( 
+                          hintText: 'Enter title', 
+                          border: OutlineInputBorder(), 
+                        ), 
+                        onSubmitted: (value) { 
+                          logger.d('Title entered: $value'); 
+                        }, 
+                      ), 
+                    ), 
+                  ), 
+                  ElevatedButton( 
+                    onPressed: () {
+                      logger.d('Submit button pressed - Saving pixel art');
+                      _savePixelArt(); // Llamar a la función de guardar
+                    }, 
+                    child: const Text('Submit'), 
+                  ), 
+                ], 
+              ), 
+            ), 
+            Expanded( 
+              child: GridView.builder( 
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount( 
+                  crossAxisCount: _sizeGrid, 
                 ), 
-         ], 
-       ), 
-     ), 
-   ); 
- }
- 
-  Future getApplicationDocumentsDirectory() async {} 
-} 
+                itemCount: _cellColors.length, 
+                itemBuilder: (context, index) { 
+                  return GestureDetector( 
+                    onTap: () { 
+                      setState(() { 
+                        _cellColors[index] = _selectedColor; 
+                      }); 
+                    }, 
+                    child: Container( 
+                      margin: const EdgeInsets.all(1),
+                      color: _cellColors[index], 
+                      child: Center( 
+                        child: _showNumbers
+                            ? Text( 
+                                '$index', 
+                                style: TextStyle( 
+                                  color: _cellColors[index] == Colors.black 
+                                      ? Colors.white 
+                                      : Colors.black, 
+                                ), 
+                              )
+                            : const SizedBox.shrink(),
+                      ), 
+                    ), 
+                  ); 
+                }, 
+              ), 
+            ), 
+            Container( 
+              padding: const EdgeInsets.symmetric(vertical: 8), 
+              color: Colors.grey[200], 
+              child: SingleChildScrollView( 
+                scrollDirection: Axis.horizontal, 
+                child: Row( 
+                  mainAxisAlignment: MainAxisAlignment.center, 
+                  children: _listColors.map((color) { 
+                    final bool isSelected = color == _selectedColor; 
+                    return GestureDetector( 
+                      onTap: () { 
+                        setState(() { 
+                          _selectedColor = color; 
+                        }); 
+                      }, 
+                      child: AnimatedContainer( 
+                        duration: const Duration(milliseconds: 200), 
+                        margin: const EdgeInsets.symmetric(horizontal: 4), 
+                        padding: EdgeInsets.all(isSelected ? 12 : 8), 
+                        decoration: BoxDecoration( 
+                          color: color, 
+                          shape: BoxShape.circle, 
+                          border: isSelected 
+                              ? Border.all(color: Colors.black, width: 2) 
+                              : null, 
+                        ), 
+                        width: isSelected ? 36 : 28, 
+                        height: isSelected ? 36 : 28, 
+                      ), 
+                    ); 
+                  }).toList(), 
+                ), 
+              ),
+            ), 
+          ], 
+        ), 
+      ), 
+    ); 
+  } 
+}

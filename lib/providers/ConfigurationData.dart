@@ -1,5 +1,4 @@
-// lib/providers/ConfigurationData.dart (COMPLETO CON PERSISTENCIA Y PALETAS DINÁMICAS)
-
+// ignore: file_names
 import 'package:flutter/material.dart';
 import 'package:lab2/services/shared_preferences_service.dart';
 
@@ -7,7 +6,8 @@ class ConfigurationData extends ChangeNotifier {
   final SharedPreferencesService _prefsService; 
 
   int _size = 12; 
-  String _colorPalette = 'basica'; 
+  String _colorPalette = 'basica';
+  List<String> _creations = []; // Lista de rutas de archivos creados
   
   final Map<String, List<Color>> _palettes = {
     'basica': [
@@ -43,6 +43,7 @@ class ConfigurationData extends ChangeNotifier {
   
   int get size => _size;
   String get colorPalette => _colorPalette;
+  List<String> get creations => List.unmodifiable(_creations); // Devolver copia inmutable
   
   List<Color> get currentColorPalette {
     return _palettes[_colorPalette] ?? _palettes['basica']!; 
@@ -56,6 +57,11 @@ class ConfigurationData extends ChangeNotifier {
     final data = await _prefsService.loadPreferences();
     _size = data['size'] as int;
     _colorPalette = data['colorPalette'] as String;
+    
+    // Cargar las creaciones guardadas
+    final loadedCreations = await _prefsService.loadCreations();
+    _creations = List<String>.from(loadedCreations);
+      
     notifyListeners(); 
   }
 
@@ -73,5 +79,34 @@ class ConfigurationData extends ChangeNotifier {
       _prefsService.saveColorPalette(newcolorPalette);
       notifyListeners(); 
     }
+  }
+
+  // Agregar una nueva creación
+  void addCreation(String filePath) {
+    if (!_creations.contains(filePath)) {
+      _creations.add(filePath);
+      _prefsService.saveCreations(_creations);
+      notifyListeners();
+    }
+  }
+
+  // Obtener la última creación
+  String? getLastCreation() {
+    if (_creations.isEmpty) return null;
+    return _creations.last;
+  }
+
+  // Eliminar una creación
+  void removeCreation(String filePath) {
+    _creations.remove(filePath);
+    _prefsService.saveCreations(_creations);
+    notifyListeners();
+  }
+
+  // Limpiar todas las creaciones
+  void clearCreations() {
+    _creations.clear();
+    _prefsService.saveCreations(_creations);
+    notifyListeners();
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
 import 'package:lab2/pixel_art_screen.dart';
 import 'package:lab2/screens/list_creation.dart';
 import 'package:lab2/screens/lista_art.dart';
@@ -29,6 +30,7 @@ class _MyAppState extends State<MyApp> {
       create: (context) => ConfigurationData(SharedPreferencesService()),
       child: MaterialApp(
         title: '2023479071',
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
             seedColor: const Color.fromARGB(255, 0, 217, 255)
@@ -66,17 +68,56 @@ class _MyHomePageState extends State<MyHomePage> {
               const Padding(
                 padding: EdgeInsets.all(16.0),
                 child: Text(
-                  'Título',
+                  'Última Creación',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
               ),
-              Container(
-                width: 250,
-                height: 250,
-                color: const Color.fromARGB(255, 8, 225, 8), 
-                child: const Center(
-                  child: Text('Imágenes.'),
-                ),
+              Consumer<ConfigurationData>(
+                builder: (context, configData, child) {
+                  final creations = configData.creations;
+                  final lastImagePath = creations.isNotEmpty ? creations.last : null;
+                  
+                  return Container(
+                    width: 250,
+                    height: 250,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      border: Border.all(color: Colors.grey[400]!, width: 2),
+                    ),
+                    child: lastImagePath != null
+                        ? ClipRect(
+                            child: Image.file(
+                              File(lastImagePath),
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) {
+                                return const Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.error_outline, size: 48, color: Colors.red),
+                                      SizedBox(height: 8),
+                                      Text('Error al cargar imagen'),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          )
+                        : const Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.image_not_supported, size: 48, color: Colors.grey),
+                                SizedBox(height: 8),
+                                Text(
+                                  'No hay creaciones aún',
+                                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                                ),
+                              ],
+                            ),
+                          ),
+                  );
+                },
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -84,8 +125,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly, 
                   children: <Widget>[
                     ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
+                      onPressed: () async {
+                        await Navigator.push(
                           context, 
                           MaterialPageRoute(builder: (context) => const ListArt())
                         );
@@ -106,8 +147,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       child: const Text('Compartir'),
                     ),
                     ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
+                      onPressed: () async {
+                        await Navigator.push(
                           context, 
                           MaterialPageRoute(builder: (context) => const PixelArtScreen())
                         );
