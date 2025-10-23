@@ -19,9 +19,14 @@ class _PixelArtScreenState extends State<PixelArtScreen> {
   int _sizeGrid = 16; 
   Color _selectedColor = Colors.black; 
   
+  // ignore: unused_field
+  File? _backgroundImage;  
+  // ignore: unused_field
+  final double _backgroundOpacity = 0.5;  
+
   bool _showNumbers = true;
   // ignore: unused_field
-  final bool _isSaving = false; // Nuevo: bandera para controlar el guardado 
+  final bool _isSaving = false; 
  
   final List<Color> _listColors = [ 
     Colors.black, 
@@ -46,7 +51,6 @@ class _PixelArtScreenState extends State<PixelArtScreen> {
     logger.d("PixelArtScreen initialized. Mounted: $mounted"); 
     _sizeGrid = context.read<ConfigurationData>().size;
     
-    // Inicializar _cellColors con el tamaño correcto
     _cellColors = List<Color>.generate(
       _sizeGrid * _sizeGrid,
       (index) => Colors.transparent,
@@ -61,7 +65,6 @@ class _PixelArtScreenState extends State<PixelArtScreen> {
     
     final newSize = context.watch<ConfigurationData>().size;
     
-    // Si el tamaño cambió, ajustar _cellColors
     if (newSize != _sizeGrid) {
       final oldColors = _cellColors;
       _cellColors = List<Color>.generate(
@@ -69,7 +72,6 @@ class _PixelArtScreenState extends State<PixelArtScreen> {
         (index) => Colors.transparent,
       );
       
-      // Copiar los colores antiguos si es posible
       final minSize = _sizeGrid < newSize ? _sizeGrid : newSize;
       for (int row = 0; row < minSize; row++) {
         for (int col = 0; col < minSize; col++) {
@@ -113,7 +115,6 @@ class _PixelArtScreenState extends State<PixelArtScreen> {
     logger.d("PixelArtScreen reassembled. Mounted: $mounted"); 
   } 
 
-  // Función para guardar el pixel art
   Future<void> _savePixelArt() async { 
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(
@@ -121,7 +122,6 @@ class _PixelArtScreenState extends State<PixelArtScreen> {
       Rect.fromLTWH(0, 0, _sizeGrid * 20.0, _sizeGrid * 20.0)
     );
 
-    // Dibujar cada celda en el canvas
     for (int row = 0; row < _sizeGrid; row++) {
       for (int col = 0; col < _sizeGrid; col++) {
         final color = _cellColors[row * _sizeGrid + col];
@@ -131,13 +131,11 @@ class _PixelArtScreenState extends State<PixelArtScreen> {
       }
     }
 
-    // Convertir a imagen
     final picture = recorder.endRecording();
     final image = await picture.toImage(_sizeGrid * 20, _sizeGrid * 20);
     final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     final imageBytes = byteData!.buffer.asUint8List();
 
-    // Guardar en el directorio de documentos
     final directory = await getApplicationDocumentsDirectory();
     final filePath = '${directory.path}/pixel_art_${DateTime.now().millisecondsSinceEpoch}.png';
     final file = File(filePath);
@@ -145,11 +143,9 @@ class _PixelArtScreenState extends State<PixelArtScreen> {
 
     logger.d('Pixel art saved to: $filePath');
 
-    // Agregar la creación al provider
     if (mounted) {
       context.read<ConfigurationData>().addCreation(filePath);
 
-      // Mostrar mensaje de éxito
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Pixel art guardado exitosamente!'),
@@ -158,7 +154,6 @@ class _PixelArtScreenState extends State<PixelArtScreen> {
         ),
       );
 
-      // Navegar de vuelta y pasar el filePath
       Navigator.pop(context, filePath);
     }
   }
@@ -207,7 +202,7 @@ class _PixelArtScreenState extends State<PixelArtScreen> {
                   ElevatedButton( 
                     onPressed: () {
                       logger.d('Submit button pressed - Saving pixel art');
-                      _savePixelArt(); // Llamar a la función de guardar
+                      _savePixelArt(); 
                     }, 
                     child: const Text('Submit'), 
                   ), 
